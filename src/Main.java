@@ -7,15 +7,17 @@ import java.util.Scanner;
 
 public class Main
 {
-    public static final String level = "Level: 100 ";
+    public static void main(String[] args) {
+        FrontEnd f = new FrontEnd();
+    }
+
+    /*public static final String level = "Level: 100 ";
     public static final String language = "Language: Italian ";
     public static final String OT = "OT: Francesco ";
     public static final String TID = "TID: 686505 ";
     public static final String SID = "SID: 3616 ";
     public static final String OTGender = "OTGender: Male ";
     public static final String ball = "Ball: Poke Ball ";
-
-
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         String line = "";
@@ -55,5 +57,5 @@ public class Main
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         clipboard.setContents(stringSelection, null);
         System.out.println("Copied to Clipboard!\n" + toJohnny.toString());
-    }
+    }*/
 }
