@@ -102,12 +102,7 @@ public class FrontEnd extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (otField.getText().isEmpty() | tidField.getText().isEmpty() | sidField.getText().isEmpty()) {
-            JFrame w = new JFrame();
-            w.setLocation(this.getLocation().x + 350, this.getLocation().y + 175);
-            w.setSize(200, 200);
-            JLabel text = new JLabel("Input error!");
-            w.add(text);
-            w.setVisible(true);
+            JOptionPane.showMessageDialog(null, "invalid parameter");
             return;
         }
         if (e.getActionCommand().equals("Generate")) {
@@ -121,7 +116,6 @@ public class FrontEnd extends JFrame implements ActionListener {
 
             String input = inputPane.getText();
             String[] list = input.split("  ");
-
 
             StringBuilder toJohnny = new StringBuilder();
             toJohnny.append("#trade ");
@@ -142,6 +136,7 @@ public class FrontEnd extends JFrame implements ActionListener {
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
             clipboard.setContents(stringSelection, null);
             System.out.println("Copied to Clipboard!\n" + toJohnny.toString());
+            JOptionPane.showMessageDialog(null, "Copied to Clipboard!");
         }
         else if(e.getActionCommand().equals("Save Trainer"))
         {
@@ -158,7 +153,9 @@ public class FrontEnd extends JFrame implements ActionListener {
                 writer.write(OTGender+"\n");
                 writer.write(language);
                 writer.close();
+                JOptionPane.showMessageDialog(null,"Trainer info saved!");
             } catch (IOException ex) {
+                JOptionPane.showMessageDialog(null, "Unexpected error");
                 throw new RuntimeException(ex);
             }
         }
