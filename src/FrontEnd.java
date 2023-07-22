@@ -5,8 +5,9 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.io.*;
-import java.net.URL;
 import java.util.Arrays;
 
 public class FrontEnd extends JFrame implements ActionListener {
@@ -19,7 +20,7 @@ public class FrontEnd extends JFrame implements ActionListener {
     private String ball;
 
     private final String[] genders = new String[]{"Male", "Female"};
-    private final String[] balls = Arrays.stream(Pokeballs.values()).map(ball -> ball.getName()).toArray(String[]::new);
+    private final String[] ballsNames = Arrays.stream(Pokeballs.values()).map(ball -> ball.getName()).toArray(String[]::new);
     private final String[] ballsPath = Arrays.stream(Pokeballs.values()).map(ball -> ball.getPath()).toArray(String[]::new);
     private final String[] languages = Arrays.stream(Languages.values()).map(lang -> lang.getLanguage()).toArray(String[]::new);
 
@@ -43,7 +44,7 @@ public class FrontEnd extends JFrame implements ActionListener {
             languagesBox.setSelectedItem(reader.readLine());
             reader.close();
         } catch (Exception e) {
-            System.out.println("File non trovato");
+            System.out.println("trainerinfo not found");
         }
     }
 
@@ -55,21 +56,21 @@ public class FrontEnd extends JFrame implements ActionListener {
         getTrainerInfo();
 
         JPanel infopanel = new JPanel(new GridLayout(7, 2, 2, 2));
-        infopanel.add(new JLabel("OT"));
+        infopanel.add(new JLabel("  OT"));
         infopanel.add(otField);
-        infopanel.add(new JLabel("OTGender"));
+        infopanel.add(new JLabel("  OTGender"));
         infopanel.add(gendersBox);
-        infopanel.add(new JLabel("TID"));
+        infopanel.add(new JLabel("  TID"));
         infopanel.add(tidField);
-        infopanel.add(new JLabel("SID"));
+        infopanel.add(new JLabel("  SID"));
         infopanel.add(sidField);
-        infopanel.add(new JLabel("Level"));
+        infopanel.add(new JLabel("  Language"));
+        infopanel.add(languagesBox);
+        infopanel.add(new JLabel("  Level"));
         infopanel.add(levelSpinner);
-        infopanel.add(new JLabel("Ball"));
+        infopanel.add(new JLabel("  Ball"));
         ballstext.setEditable(false);
         infopanel.add(ballstext);
-        infopanel.add(new JLabel("Language"));
-        infopanel.add(languagesBox);
 
         JPanel ballpanel = new JPanel(new GridLayout(6, 4, 2, 2));
         for (int i = 0; i < ballsPath.length; i++) {
@@ -79,25 +80,43 @@ public class FrontEnd extends JFrame implements ActionListener {
                 img = ImageIO.read(getClass().getResourceAsStream(ballsPath[i]));
                 b = new JButton(new ImageIcon(img));
             } catch (IOException e) {
-                b = new JButton(balls[i]);
+                b = new JButton(ballsNames[i]);
             }
             int index = i;
             b.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    ballstext.setText(balls[index]);
+                    ballstext.setText(ballsNames[index]);
                 }
             });
             ballpanel.add(b);
         }
 
         JPanel thirdPanel = new JPanel(new GridLayout(2, 1, 2, 2));
+        inputPane.setText("Paste your Showdown export here");
+        inputPane.setForeground(Color.red);
+        inputPane.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (inputPane.getText().equals("Paste your Showdown export here")) {
+                    inputPane.setText("");
+                    inputPane.setForeground(Color.BLACK);
+                }
+            }
+            @Override
+            public void focusLost(FocusEvent e) {
+                    if (inputPane.getText().isEmpty()) {
+                        inputPane.setText("Paste your Showdown export here");
+                        inputPane.setForeground(Color.red);
+                    }
+            }
+        });
         thirdPanel.add(inputPane);
         JPanel buttonPanel = new JPanel(new GridLayout(2, 1, 2, 2));
         JButton generate = new JButton("Generate");
         generate.addActionListener(this);
         buttonPanel.add(generate);
-        JButton save = new JButton("Save Trainer");
+        JButton save = new JButton("Save Trainer Info");
         save.addActionListener(this);
         buttonPanel.add(save);
         thirdPanel.add(buttonPanel);
@@ -108,12 +127,32 @@ public class FrontEnd extends JFrame implements ActionListener {
         setVisible(true);
     }
 
+    private boolean checkInput(JTextField otField, JTextField tidField, JTextField sidField)
+    {
+        if (otField.getText().isEmpty() | tidField.getText().isEmpty() | sidField.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Invalid entries");
+            return false;
+        }
+        if(otField.getText().length()>12)
+        {
+            JOptionPane.showMessageDialog(null, "OT too long");
+            return false;
+        }
+        try{
+            int n = Integer.parseInt(tidField.getText());
+            n = Integer.parseInt(sidField.getText());
+        } catch(NumberFormatException ne)
+        {
+            JOptionPane.showMessageDialog(null, "TID/SID is not a number");
+            return false;
+        }
+        return true;
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (otField.getText().isEmpty() | tidField.getText().isEmpty() | sidField.getText().isEmpty()) {
-            JOptionPane.showMessageDialog(null, "invalid parameter");
+        if(!checkInput(otField, tidField, sidField))
             return;
-        }
         if (e.getActionCommand().equals("Generate")) {
             level = String.valueOf(levelSpinner.getValue());
             language = languagesBox.getSelectedItem().toString();
@@ -130,10 +169,11 @@ public class FrontEnd extends JFrame implements ActionListener {
             toJohnny.append("#trade ");
             int size = list.length;
             for (int i = 0; i < size; i++) {
-                toJohnny.append(list[i]);
+                if(i!=2)
+                    toJohnny.append(list[i]);
                 if (i == 1) {
-                    toJohnny.append(" Level: " + level);
-                    toJohnny.append(" Language: " + language);
+                    toJohnny.append("\nLevel: " + level);
+                    toJohnny.append("\nLanguage: " + language);
                     toJohnny.append(" OT: " + OT);
                     toJohnny.append(" TID: " + TID);
                     toJohnny.append(" SID: " + SID);
@@ -147,7 +187,7 @@ public class FrontEnd extends JFrame implements ActionListener {
             System.out.println("Copied to Clipboard!\n" + toJohnny.toString());
             JOptionPane.showMessageDialog(null, "Copied to Clipboard!");
         }
-        else if(e.getActionCommand().equals("Save Trainer"))
+        else if(e.getActionCommand().equals("Save Trainer Info"))
         {
             OT = otField.getText();
             TID = tidField.getText();
