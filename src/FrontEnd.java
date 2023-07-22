@@ -1,3 +1,4 @@
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
@@ -5,6 +6,7 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
+import java.net.URL;
 import java.util.Arrays;
 
 public class FrontEnd extends JFrame implements ActionListener {
@@ -71,7 +73,14 @@ public class FrontEnd extends JFrame implements ActionListener {
 
         JPanel ballpanel = new JPanel(new GridLayout(6, 4, 2, 2));
         for (int i = 0; i < ballsPath.length; i++) {
-            JButton b = new JButton(new ImageIcon(ballsPath[i]));
+            Image img = null;
+            JButton b = null;
+            try {
+                img = ImageIO.read(getClass().getResourceAsStream(ballsPath[i]));
+                b = new JButton(new ImageIcon(img));
+            } catch (IOException e) {
+                b = new JButton(balls[i]);
+            }
             int index = i;
             b.addActionListener(new ActionListener() {
                 @Override
