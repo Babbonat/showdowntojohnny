@@ -23,7 +23,16 @@ public enum Pokeballs
     QUICKBALL("Quick Ball", "icons/quickball.png"),
     DUSKBALL("Dusk Ball", "icons/duskball.png"),
     DREAMBALL("Dream Ball", "icons/dreamball.png"),
-    BEASTBALL("Beast Ball", "icons/beastball.png");
+    BEASTBALL("Beast Ball", "icons/beastball.png"),
+    L_POKEBALL("Poke Ball", "icons/pokeballlegends.png"),
+    L_GREATBALL("Great Ball", "icons/greatballlegends.png"),
+    L_ULTRABALL("Ultra Ball", "icons/ultraballlegends.png"),
+    L_HEAVYBALL("Heavy Ball", "icons/heavyballlegends.png"),
+    LEADENBALL("Leaden Ball", "icons/leadenball.png"),
+    GIGATONBALL("Gigaton Ball", "icons/gigatonball.png"),
+    FEATHERBALL("Feather Ball", "icons/featherball.png"),
+    WINGBALL("Wing Ball", "icons/wingball.png"),
+    JETBALL("Jet Ball", "icons/jetball.png");
     private String name;
     private String path;
 
