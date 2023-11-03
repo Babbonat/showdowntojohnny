@@ -7,6 +7,7 @@ import java.awt.event.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 public class FrontEnd extends JFrame implements ActionListener {
     private String level;
@@ -23,7 +24,7 @@ public class FrontEnd extends JFrame implements ActionListener {
     private final String[] languages = Arrays.stream(Languages.values()).map(lang -> lang.getLanguage()).toArray(String[]::new);
     private final String[] gamesNames = Arrays.stream(Games.values()).map(game -> game.getName()).toArray(String[]::new);
     private final String[] gamesPrefix = Arrays.stream(Games.values()).map(game -> game.getPrefix()).toArray(String[]::new);
-
+    private final String[] statsNames = new String[] {"HP", "Atk", "Def", "SpA", "SpD", "Spe"};
 
     private JTextPane inputPane = new JTextPane();
     private JSpinner levelSpinner = new JSpinner(new SpinnerNumberModel(100, 1, 100, 1));
@@ -34,6 +35,10 @@ public class FrontEnd extends JFrame implements ActionListener {
     private JTextField tidField = new JTextField();
     private JTextField sidField = new JTextField();
     private JTextField ballstext = new JTextField("Poke Ball");
+    private ArrayList<JCheckBox> statsIvs = new ArrayList<>(6);
+    private HashMap<String, Stats> ivMap = new HashMap<>();
+
+
 
     private boolean getTrainerInfo(String game)
     {
@@ -69,7 +74,12 @@ public class FrontEnd extends JFrame implements ActionListener {
             buttons.add(null);
         }
 
-        JPanel infopanel = new JPanel(new GridLayout(8, 2, 2, 2));
+        for(int i = 0; i < 6; i++) {
+            ivMap.put(statsNames[i], new Stats(statsNames[i]));
+            statsIvs.add(new JCheckBox(statsNames[i]));
+        }
+
+        JPanel infopanel = new JPanel(new GridLayout(10, 2, 2, 2));
         infopanel.add(new JLabel("  Game"));
         infopanel.add(gamesBox);
         infopanel.add(new JLabel("  OT"));
@@ -84,10 +94,9 @@ public class FrontEnd extends JFrame implements ActionListener {
         infopanel.add(languagesBox);
         infopanel.add(new JLabel("  Level"));
         infopanel.add(levelSpinner);
-        infopanel.add(new JLabel("  Ball"));
-        ballstext.setEditable(false);
-        infopanel.add(ballstext);
-
+        for(int i = 0; i < 6; i++) {
+            infopanel.add(statsIvs.get(i));
+        }
         gamesBox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -137,7 +146,9 @@ public class FrontEnd extends JFrame implements ActionListener {
                 buttons.get(i).setEnabled(false);
             ballpanel.add(buttons.get(i));
         }
-
+        ballpanel.add(new JLabel("   Selected:"));
+        ballstext.setEditable(false);
+        ballpanel.add(ballstext);
 
         JPanel thirdPanel = new JPanel(new GridLayout(2, 1, 2, 2));
         inputPane.setText("Paste your Showdown export here");
@@ -217,27 +228,12 @@ public class FrontEnd extends JFrame implements ActionListener {
             OTGender = gendersBox.getSelectedItem().toString();
             ball = ballstext.getText();
 
+            for(int i = 0; i < 6 ; i++)
+                ivMap.get(statsNames[i]).select(statsIvs.get(i).isSelected());
+            JohnnyStringBuilder johnnyStringBuilder = new JohnnyStringBuilder(gamesBox.getSelectedItem().toString(), level, language, OT, TID, SID, OTGender, ball, ivMap);
             String input = inputPane.getText();
-            String[] list = input.split("  ");
-            String prefix = gamesPrefix[gamesBox.getSelectedIndex()];
+            String toJohnny = johnnyStringBuilder.transformString(input);
 
-            StringBuilder toJohnny = new StringBuilder();
-            toJohnny.append(prefix);
-            toJohnny.append("trade ");
-            int size = list.length;
-            for (int i = 0; i < size; i++) {
-                if(i!=2)
-                    toJohnny.append(list[i]);
-                if (i == 1) {
-                    toJohnny.append("\nLevel: " + level);
-                    toJohnny.append("\nLanguage: " + language);
-                    toJohnny.append(" OT: " + OT);
-                    toJohnny.append(" TID: " + TID);
-                    toJohnny.append(" SID: " + SID);
-                    toJohnny.append(" OTGender: " + OTGender);
-                    toJohnny.append(" Ball: " + ball);
-                }
-            }
             StringSelection stringSelection = new StringSelection(toJohnny.toString());
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
             clipboard.setContents(stringSelection, null);
