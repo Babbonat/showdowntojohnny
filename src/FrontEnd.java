@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 public class FrontEnd extends JFrame implements ActionListener {
+    private String game;
     private String level;
     private String language;
     private String OT;
@@ -17,13 +18,17 @@ public class FrontEnd extends JFrame implements ActionListener {
     private String SID;
     private String OTGender;
     private String ball;
+    private String metLocation;
+    private String mark;
 
     private final String[] genders = new String[]{"Male", "Female"};
     private final String[] ballsNames = Arrays.stream(Pokeballs.values()).map(ball -> ball.getName()).toArray(String[]::new);
     private final String[] ballsPath = Arrays.stream(Pokeballs.values()).map(ball -> ball.getPath()).toArray(String[]::new);
     private final String[] languages = Arrays.stream(Languages.values()).map(lang -> lang.getLanguage()).toArray(String[]::new);
     private final String[] gamesNames = Arrays.stream(Games.values()).map(game -> game.getName()).toArray(String[]::new);
-    private final String[] gamesPrefix = Arrays.stream(Games.values()).map(game -> game.getPrefix()).toArray(String[]::new);
+    private final String[] locationsNames = Arrays.stream(MetLocations.values()).map(location -> location.getName()).toArray(String[]::new);
+    private final String[] marksNames = Arrays.stream(Marks.values()).map(mark -> mark.getName()).toArray(String[]::new);
+    //private final String[] gamesPrefix = Arrays.stream(Games.values()).map(game -> game.getPrefix()).toArray(String[]::new);
     private final String[] statsNames = new String[] {"HP", "Atk", "Def", "SpA", "SpD", "Spe"};
 
     private JTextPane inputPane = new JTextPane();
@@ -35,6 +40,8 @@ public class FrontEnd extends JFrame implements ActionListener {
     private JTextField tidField = new JTextField();
     private JTextField sidField = new JTextField();
     private JTextField ballstext = new JTextField("Poke Ball");
+    private JComboBox locationsBox = new JComboBox(locationsNames);
+    private JComboBox marksBox = new JComboBox(marksNames);
     private ArrayList<JCheckBox> statsIvs = new ArrayList<>(6);
     private HashMap<String, Stats> ivMap = new HashMap<>();
 
@@ -59,7 +66,7 @@ public class FrontEnd extends JFrame implements ActionListener {
 
     public FrontEnd() {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(900, 450);
+        setSize(900, 600);
         setResizable(false);
         this.setLayout(new GridLayout(1, 3, 2, 2));
 
@@ -79,7 +86,7 @@ public class FrontEnd extends JFrame implements ActionListener {
             statsIvs.add(new JCheckBox(statsNames[i]));
         }
 
-        JPanel infopanel = new JPanel(new GridLayout(10, 2, 2, 2));
+        JPanel infopanel = new JPanel(new GridLayout(12, 2, 2, 2));
         infopanel.add(new JLabel("  Game"));
         infopanel.add(gamesBox);
         infopanel.add(new JLabel("  OT"));
@@ -94,6 +101,10 @@ public class FrontEnd extends JFrame implements ActionListener {
         infopanel.add(languagesBox);
         infopanel.add(new JLabel("  Level"));
         infopanel.add(levelSpinner);
+        infopanel.add(new JLabel("  Met Location"));
+        infopanel.add(locationsBox);
+        infopanel.add(new JLabel("  Mark"));
+        infopanel.add(marksBox);
         for(int i = 0; i < 6; i++) {
             infopanel.add(statsIvs.get(i));
         }
@@ -146,6 +157,7 @@ public class FrontEnd extends JFrame implements ActionListener {
                 buttons.get(i).setEnabled(false);
             ballpanel.add(buttons.get(i));
         }
+        ballpanel.add(new JLabel(""));
         ballpanel.add(new JLabel("   Selected:"));
         ballstext.setEditable(false);
         ballpanel.add(ballstext);
@@ -220,6 +232,7 @@ public class FrontEnd extends JFrame implements ActionListener {
                 JOptionPane.showMessageDialog(null, "Paste a Showdown export");
                 return;
             }
+            game = gamesBox.getSelectedItem().toString();
             level = String.valueOf(levelSpinner.getValue());
             language = languagesBox.getSelectedItem().toString();
             OT = otField.getText();
@@ -227,10 +240,12 @@ public class FrontEnd extends JFrame implements ActionListener {
             SID = sidField.getText();
             OTGender = gendersBox.getSelectedItem().toString();
             ball = ballstext.getText();
+            metLocation = locationsBox.getSelectedItem().toString();
+            mark = marksBox.getSelectedItem().toString();
 
             for(int i = 0; i < 6 ; i++)
                 ivMap.get(statsNames[i]).select(statsIvs.get(i).isSelected());
-            JohnnyStringBuilder johnnyStringBuilder = new JohnnyStringBuilder(gamesBox.getSelectedItem().toString(), level, language, OT, TID, SID, OTGender, ball, ivMap);
+            JohnnyStringBuilder johnnyStringBuilder = new JohnnyStringBuilder(game, level, language, OT, TID, SID, OTGender, ball, metLocation, mark, ivMap);
             String input = inputPane.getText();
             String toJohnny = johnnyStringBuilder.transformString(input);
 

@@ -7,8 +7,8 @@ public enum Languages
     GER("German"),
     ESP("Spanish"),
     KOR("Korean"),
-    CHS("Chinese-semplified"),
-    CHT("Chinese-traditional");
+    CHS("ChineseS"),
+    CHT("ChineseT");
 
     private String language;
     Languages(String language)

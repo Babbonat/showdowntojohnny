@@ -12,11 +12,13 @@ public class JohnnyStringBuilder
     private final String OT;
     private final String TID;
     private final String SID;
-    private String OTGender;
+    private final String OTGender;
     private final String ball;
+    private final String metLocation;
+    private final String mark;
     private HashMap<String, Stats> ivMap;
 
-    public JohnnyStringBuilder(String game, String level, String language, String OT, String TID, String SID, String OTGender, String ball, HashMap<String, Stats> ivMap) {
+    public JohnnyStringBuilder(String game, String level, String language, String OT, String TID, String SID, String OTGender, String ball, String metLocation, String mark, HashMap<String, Stats> ivMap) {
         this.game = game;
         this.level = level;
         this.language = language;
@@ -25,6 +27,8 @@ public class JohnnyStringBuilder
         this.SID = SID;
         this.OTGender = OTGender;
         this.ball = ball;
+        this.metLocation = metLocation;
+        this.mark = mark;
         this.ivMap = ivMap;
     }
 
@@ -39,6 +43,7 @@ public class JohnnyStringBuilder
     }
 
     public String transformString(String input) {
+        boolean done = false;
         String[] lines = input.split("\n");
         StringBuilder toJohnny = new StringBuilder();
         int i = 0;
@@ -104,8 +109,16 @@ public class JohnnyStringBuilder
 
         if(isPresent)
             i++;
-        while(i<lines.length)
+        while(i<lines.length) {
+            if (!done && lines[i].startsWith("-")) {
+                if (!metLocation.equals("None"))
+                    toJohnny.append(metLocation + "\n");
+                if (!mark.equals("None"))
+                    toJohnny.append(mark + "\n");
+                done = true;
+            }
             toJohnny.append(lines[i++]).append("\n");
+        }
 
         return toJohnny.toString();
     }
